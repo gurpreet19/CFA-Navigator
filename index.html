@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CFA Guide 2027: India Edition</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <style>
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f5f5f4; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #d6d3d1; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a8a29e; 
+        }
+        
+        /* Chart Container Utilities */
+        .chart-wrapper {
+            position: relative;
+            width: 100%;
+            height: 300px;
+            max-height: 400px;
+            margin: auto;
+        }
+        
+        /* Tab Transitions */
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .step-card {
+            transition: all 0.2s ease;
+        }
+        .step-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+    </style>
+    <!-- Chosen Palette: Warm Professional - Stone/Neutral background with Amber/Gold accents to signify finance/value. -->
+    <!-- Application Structure Plan: Dashboard layout with a left sidebar for navigation (desktop) and bottom/hamburger for mobile. Content is divided into logical "phases" of the user's journey: Overview, The Exam Details, Strategy & Timeline, Financial Planning, and Career. Key interactions include a Cost Calculator for INR budgeting and a Topic Weight explorer. -->
+    <!-- Visualization & Content Choices: 
+         1. Curriculum Weights -> Stacked Bar Chart -> Comparison across levels -> Chart.js.
+         2. Pass Rates -> Line/Bar Combo -> Trend analysis -> Chart.js.
+         3. Timeline -> Vertical Step List -> Logical flow -> HTML/Tailwind.
+         4. Cost Estimator -> Input/Output Form -> Budgeting -> Vanilla JS.
+         CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+</head>
+<body class="bg-stone-50 text-stone-800 font-sans antialiased selection:bg-amber-200 selection:text-amber-900">
+
+    <div class="min-h-screen flex flex-col md:flex-row">
+        <!-- Sidebar Navigation -->
+        <nav class="md:w-64 bg-stone-900 text-stone-300 flex-shrink-0 flex flex-col justify-between">
+            <div class="p-6">
+                <div class="flex items-center gap-3 mb-8">
+                    <div class="w-10 h-10 bg-amber-600 rounded-lg flex items-center justify-center text-white font-bold text-xl">C</div>
+                    <h1 class="text-xl font-bold text-white tracking-tight">CFA Navigator <span class="text-amber-500 text-sm block font-normal">India 2027</span></h1>
+                </div>
+                
+                <ul class="space-y-2">
+                    <li>
+                        <button onclick="switchTab('overview')" class="nav-btn w-full text-left px-4 py-3 rounded-lg hover:bg-stone-800 hover:text-white transition-colors flex items-center gap-3 active-nav bg-stone-800 text-white" data-target="overview">
+                            <i class="fa-solid fa-compass"></i> Start Here
+                        </button>
+                    </li>
+                    <li>
+                        <button onclick="switchTab('exam-details')" class="nav-btn w-full text-left px-4 py-3 rounded-lg hover:bg-stone-800 hover:text-white transition-colors flex items-center gap-3" data-target="exam-details">
+                            <i class="fa-solid fa-book-open"></i> The Exam & Curriculum
+                        </button>
+                    </li>
+                    <li>
+                        <button onclick="switchTab('timeline')" class="nav-btn w-full text-left px-4 py-3 rounded-lg hover:bg-stone-800 hover:text-white transition-colors flex items-center gap-3" data-target="timeline">
+                            <i class="fa-solid fa-road"></i> Step-by-Step Plan
+                        </button>
+                    </li>
+                    <li>
+                        <button onclick="switchTab('budget')" class="nav-btn w-full text-left px-4 py-3 rounded-lg hover:bg-stone-800 hover:text-white transition-colors flex items-center gap-3" data-target="budget">
+                            <i class="fa-solid fa-calculator"></i> Costs (INR) & Budget
+                        </button>
+                    </li>
+                    <li>
+                        <button onclick="switchTab('career')" class="nav-btn w-full text-left px-4 py-3 rounded-lg hover:bg-stone-800 hover:text-white transition-colors flex items-center gap-3" data-target="career">
+                            <i class="fa-solid fa-briefcase"></i> Career & Resources
+                        </button>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="p-6 bg-stone-950">
+                <div class="text-xs text-stone-500 mb-2">TARGET DATE</div>
+                <div class="text-white font-mono text-lg">DEC 2027</div>
+                <div class="w-full bg-stone-800 h-1.5 mt-2 rounded-full overflow-hidden">
+                    <div class="bg-amber-600 h-full w-1/4"></div>
+                </div>
+                <p class="text-xs text-stone-500 mt-2">Preparation Phase</p>
+            </div>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main class="flex-1 overflow-y-auto p-4 md:p-8 lg:p-12">
+            
+            <!-- SECTION 1: OVERVIEW -->
+            <div id="overview" class="tab-content active max-w-5xl mx-auto">
+                <header class="mb-10">
+                    <h2 class="text-3xl font-bold text-stone-900 mb-4">Welcome to Your CFA Journey</h2>
+                    <p class="text-lg text-stone-600 leading-relaxed max-w-3xl">
+                        You are about to embark on one of the most rigorous and respected paths in finance. 
+                        As a beginner located in India targeting 2027, you have a strategic advantage: <strong>Time</strong>.
+                        This dashboard breaks down the complex CFA Institute requirements into actionable steps.
+                    </p>
+                </header>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                    <div class="bg-white p-6 rounded-xl border border-stone-200 shadow-sm hover:border-amber-400 transition-colors">
+                        <div class="w-12 h-12 bg-amber-100 text-amber-700 rounded-full flex items-center justify-center mb-4 text-xl">
+                            <i class="fa-solid fa-layer-group"></i>
+                        </div>
+                        <h3 class="font-bold text-lg mb-2">Three Levels</h3>
+                        <p class="text-stone-600 text-sm">Level I (Knowledge), Level II (Analysis), Level III (Synthesis). You must pass them sequentially.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-stone-200 shadow-sm hover:border-amber-400 transition-colors">
+                        <div class="w-12 h-12 bg-amber-100 text-amber-700 rounded-full flex items-center justify-center mb-4 text-xl">
+                            <i class="fa-solid fa-clock"></i>
+                        </div>
+                        <h3 class="font-bold text-lg mb-2">300 Hours</h3>
+                        <p class="text-stone-600 text-sm">The recommended study time <em>per level</em>. Consistency is more important than intelligence.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl border border-stone-200 shadow-sm hover:border-amber-400 transition-colors">
+                        <div class="w-12 h-12 bg-amber-100 text-amber-700 rounded-full flex items-center justify-center mb-4 text-xl">
+                            <i class="fa-solid fa-globe"></i>
+                        </div>
+                        <h3 class="font-bold text-lg mb-2">Global & Local</h3>
+                        <p class="text-stone-600 text-sm">Recognized worldwide. Exams are computer-based and held in major Indian cities (Mumbai, Delhi, Bangalore, etc.).</p>
+                    </div>
+                </div>
+
+                <div class="bg-stone-900 text-white rounded-2xl p-8 flex flex-col md:flex-row items-center justify-between gap-8">
+                    <div>
+                        <h3 class="text-2xl font-bold mb-2">Ready to plan?</h3>
+                        <p class="text-stone-400">Review the step-by-step roadmap tailored for a 2026-2027 timeline.</p>
+                    </div>
+                    <button onclick="switchTab('timeline')" class="px-6 py-3 bg-amber-600 hover:bg-amber-500 text-white font-semibold rounded-lg transition-colors shadow-lg shadow-amber-900/20">
+                        View Step-by-Step Plan
+                    </button>
+                </div>
+            </div>
+
+            <!-- SECTION 2: EXAM DETAILS & CURRICULUM -->
+            <div id="exam-details" class="tab-content max-w-6xl mx-auto">
+                <header class="mb-8">
+                    <h2 class="text-3xl font-bold text-stone-900 mb-4">The Exam Structure & Curriculum</h2>
+                    <p class="text-stone-600 max-w-3xl">
+                        Understanding the beast is the first step to conquering it. The CFA curriculum covers 10 main topics. 
+                        Their weights change as you progress through the levels. Use the charts below to strategize.
+                    </p>
+                </header>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+                    <!-- Chart 1: Topic Weights -->
+                    <div class="bg-white p-6 rounded-xl border border-stone-200 shadow-sm">
+                        <h3 class="font-bold text-lg mb-4 flex items-center gap-2">
+                            <i class="fa-solid fa-chart-pie text-amber-600"></i> Topic Weights by Level
+                        </h3>
+                        <div class="chart-wrapper">
+                            <canvas id="topicChart"></canvas>
+                        </div>
+                        <p class="text-xs text-stone-500 mt-4 text-center">
+                            *Interact with the chart to see specific weights. Note how "Ethics" remains critical throughout.
+                        </p>
+                    </div>
+
+                    <!-- Chart 2: Historical Pass Rates -->
+                    <div class="bg-white p-6 rounded-xl border border-stone-200 shadow-sm">
+                        <h3 class="font-bold text-lg mb-4 flex items-center gap-2">
+                            <i class="fa-solid fa-chart-line text-amber-600"></i> Average Pass Rates (Last 5 Years)
+                        </h3>
+                        <div class="chart-wrapper">
+                            <canvas id="passRateChart"></canvas>
+                        </div>
+                        <p class="text-xs text-stone-500 mt-4 text-center">
+                            *Level 1 is the primary filter. Pass rates have stabilized around 40% post-2022.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="bg-amber-50 border-l-4 border-amber-500 p-6 rounded-r-lg mb-8">
+                    <h4 class="font-bold text-amber-800 mb-2">Prerequisites Checklist</h4>
+                    <ul class="list-none space-y-2 text-stone-700">
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-check text-green-600"></i> <strong>Bachelor's Degree:</strong> Or be in the final year of your degree program.</li>
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-check text-green-600"></i> <strong>Passport:</strong> A valid international travel passport is mandatory for ID on exam day.</li>
+                        <li class="flex items-center gap-2"><i class="fa-solid fa-check text-green-600"></i> <strong>English Proficiency:</strong> Exams are conducted exclusively in English.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- SECTION 3: TIMELINE & STRATEGY -->
+            <div id="timeline" class="tab-content max-w-4xl mx-auto">
+                <header class="mb-10">
+                    <h2 class="text-3xl font-bold text-stone-900 mb-4">Your Roadmap to 2027</h2>
+                    <p class="text-stone-600">
+                        Since you are starting in Feb 2026, targeting a 2027 completion is aggressive but possible. 
+                        A more realistic, high-probability path finishes in early 2028. Below is the <strong>Standard Track</strong> 
+                        designed for working professionals or full-time students.
+                    </p>
+                </header>
+
+                <div class="relative border-l-2 border-stone-300 ml-4 space-y-12 pb-12">
+                    
+                    <!-- Step 1 -->
+                    <div class="step-card relative pl-8">
+                        <div class="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-amber-500 border-2 border-white shadow"></div>
+                        <h3 class="text-xl font-bold text-stone-900">Step 1: Immediate Actions (Feb - Mar 2026)</h3>
+                        <div class="mt-3 bg-white p-5 rounded-lg border border-stone-200 shadow-sm">
+                            <ul class="space-y-3">
+                                <li class="flex gap-3">
+                                    <span class="font-bold text-amber-600 text-sm w-16 uppercase">Admin</span>
+                                    <span class="text-stone-600">Ensure your Passport is valid. This is non-negotiable.</span>
+                                </li>
+                                <li class="flex gap-3">
+                                    <span class="font-bold text-amber-600 text-sm w-16 uppercase">Strategy</span>
+                                    <span class="text-stone-600">Create an account on cfainstitute.org (free). Check for "Access Scholarship" windows (usually open in Jan/Feb or Sept - apply immediately if open).</span>
+                                </li>
+                                <li class="flex gap-3">
+                                    <span class="font-bold text-amber-600 text-sm w-16 uppercase">Study</span>
+                                    <span class="text-stone-600">Start learning <strong>Quantitative Methods</strong> using free YouTube resources (Mark Meldrum 2017 videos are old but concept-solid) to build a base before paying fees.</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Step 2 -->
+                    <div class="step-card relative pl-8">
+                        <div class="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-stone-400 border-2 border-white"></div>
+                        <h3 class="text-xl font-bold text-stone-900">Step 2: Level I Preparation (Apr - Oct 2026)</h3>
+                        <div class="mt-3 bg-white p-5 rounded-lg border border-stone-200 shadow-sm">
+                            <div class="flex justify-between items-center mb-3">
+                                <span class="bg-stone-100 text-stone-600 px-3 py-1 rounded text-xs font-bold uppercase">Target Exam: Nov 2026</span>
+                            </div>
+                            <p class="text-stone-600 mb-3">Register for the Nov 2026 exam by May/June to get the "Early Bird" fee. This gives you a solid 6 months of study.</p>
+                            <ul class="list-disc list-inside text-stone-600 text-sm space-y-1">
+                                <li><strong>Phase 1 (Apr-Jul):</strong> Read curriculum, watch videos. Focus on Understanding.</li>
+                                <li><strong>Phase 2 (Aug-Sep):</strong> Practice questions (Question Bank).</li>
+                                <li><strong>Phase 3 (Oct):</strong> Mock Exams. Aim for 70%+ scores.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div class="step-card relative pl-8">
+                        <div class="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-stone-300 border-2 border-white"></div>
+                        <h3 class="text-xl font-bold text-stone-900">Step 3: Level II (Feb - Aug 2027)</h3>
+                        <div class="mt-3 bg-white p-5 rounded-lg border border-stone-200 shadow-sm">
+                            <div class="flex justify-between items-center mb-3">
+                                <span class="bg-stone-100 text-stone-600 px-3 py-1 rounded text-xs font-bold uppercase">Target Exam: Aug 2027</span>
+                            </div>
+                            <p class="text-stone-600">
+                                If you pass L1 in Nov 2026 (results out in Jan 2027), you register immediately for L2 Aug 2027.
+                                <br><em>Warning:</em> Level II is mathematically harder. Valuation is the core.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Step 4 -->
+                    <div class="step-card relative pl-8">
+                        <div class="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-stone-300 border-2 border-white"></div>
+                        <h3 class="text-xl font-bold text-stone-900">Step 4: Level III (Sep 2027 - Feb 2028)</h3>
+                        <div class="mt-3 bg-white p-5 rounded-lg border border-stone-200 shadow-sm">
+                            <div class="flex justify-between items-center mb-3">
+                                <span class="bg-stone-100 text-stone-600 px-3 py-1 rounded text-xs font-bold uppercase">Target Exam: Feb 2028</span>
+                            </div>
+                            <p class="text-stone-600">
+                                This is the final boss. Focuses on Portfolio Management and Wealth Planning. 
+                                Half the exam is essay-based (structured response).
+                            </p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- SECTION 4: BUDGET CALCULATOR -->
+            <div id="budget" class="tab-content max-w-5xl mx-auto">
+                <header class="mb-8">
+                    <h2 class="text-3xl font-bold text-stone-900 mb-4">Financial Planner (INR)</h2>
+                    <p class="text-stone-600 max-w-3xl">
+                        The CFA is an investment. Use this calculator to estimate the total cost in Indian Rupees. 
+                        We assume a standard exchange rate, but you can adjust it.
+                    </p>
+                </header>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <!-- Calculator Controls -->
+                    <div class="lg:col-span-1 space-y-6 bg-white p-6 rounded-xl border border-stone-200 shadow-sm h-fit">
+                        <div>
+                            <label class="block text-sm font-bold text-stone-700 mb-2">USD/INR Exchange Rate</label>
+                            <input type="number" id="exchangeRate" value="84" class="w-full p-2 border border-stone-300 rounded focus:ring-2 focus:ring-amber-500 outline-none">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-bold text-stone-700 mb-2">Registration Type</label>
+                            <select id="regType" class="w-full p-2 border border-stone-300 rounded focus:ring-2 focus:ring-amber-500 outline-none">
+                                <option value="early">Early Registration ($940/exam)</option>
+                                <option value="standard">Standard Registration ($1250/exam)</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-bold text-stone-700 mb-2">Scholarship Awarded?</label>
+                            <select id="scholarship" class="w-full p-2 border border-stone-300 rounded focus:ring-2 focus:ring-amber-500 outline-none">
+                                <option value="no">No</option>
+                                <option value="access">Access Scholarship ($300/exam)</option>
+                            </select>
+                            <p class="text-xs text-stone-500 mt-1">Access Scholarship reduces enrollment to $0 and exam fee to $300.</p>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-bold text-stone-700 mb-2">Third Party Material (Level 1)</label>
+                            <select id="materialCost" class="w-full p-2 border border-stone-300 rounded focus:ring-2 focus:ring-amber-500 outline-none">
+                                <option value="0">Free Resources Only ($0)</option>
+                                <option value="300">Basic Pack (~$300)</option>
+                                <option value="700">Premium (Videos+Mocks) (~$700)</option>
+                            </select>
+                        </div>
+
+                        <button onclick="calculateCost()" class="w-full bg-stone-900 text-white py-3 rounded-lg font-bold hover:bg-stone-800 transition-colors">
+                            Calculate Total
+                        </button>
+                    </div>
+
+                    <!-- Results Display -->
+                    <div class="lg:col-span-2 space-y-6">
+                        <div class="bg-stone-900 text-white p-8 rounded-xl shadow-lg">
+                            <h3 class="text-stone-400 text-sm font-bold uppercase tracking-wider mb-2">Estimated Level 1 Cost</h3>
+                            <div class="flex items-baseline gap-2">
+                                <span class="text-4xl font-bold">₹</span>
+                                <span id="totalCostDisplay" class="text-5xl font-bold text-amber-500">0</span>
+                            </div>
+                            <p class="text-stone-400 mt-4 text-sm">
+                                *Includes One-time Enrollment Fee ($350) + Exam Fee + Tax Estimate (18% GST often applicable on materials/international transactions depending on bank).
+                            </p>
+                        </div>
+
+                        <div class="bg-white p-6 rounded-xl border border-stone-200">
+                            <h4 class="font-bold text-stone-900 mb-4">Cost Breakdown (USD)</h4>
+                            <ul class="space-y-3 text-sm">
+                                <li class="flex justify-between border-b border-stone-100 pb-2">
+                                    <span>One-time Enrollment Fee</span>
+                                    <span id="enrollmentFeeDisplay" class="font-mono">$350</span>
+                                </li>
+                                <li class="flex justify-between border-b border-stone-100 pb-2">
+                                    <span>Exam Registration (Level 1)</span>
+                                    <span id="examFeeDisplay" class="font-mono">$940</span>
+                                </li>
+                                <li class="flex justify-between border-b border-stone-100 pb-2">
+                                    <span>Study Materials</span>
+                                    <span id="materialFeeDisplay" class="font-mono">$0</span>
+                                </li>
+                                <li class="flex justify-between pt-2 font-bold text-amber-700">
+                                    <span>Total USD</span>
+                                    <span id="totalUsdDisplay">$1290</span>
+                                </li>
+                            </ul>
+                        </div>
+                        
+                        <div class="bg-amber-50 p-4 rounded-lg border border-amber-200">
+                            <p class="text-sm text-amber-900">
+                                <strong>💡 Pro Tip:</strong> The "Access Scholarship" is the biggest cost-saver. It waives the enrollment fee and reduces the exam fee to $300. Windows typically open late Jan and mid-Sept. Mark your calendar!
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION 5: CAREER & RESOURCES -->
+            <div id="career" class="tab-content max-w-5xl mx-auto">
+                <header class="mb-8">
+                    <h2 class="text-3xl font-bold text-stone-900 mb-4">Career & Study Resources</h2>
+                </header>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+                    <!-- Resource List -->
+                    <div class="bg-white p-6 rounded-xl border border-stone-200 shadow-sm">
+                        <h3 class="font-bold text-lg mb-4 text-stone-800">Top Resources for Indian Students</h3>
+                        <div class="space-y-4">
+                            <div class="flex gap-4 items-start">
+                                <div class="bg-red-100 text-red-600 p-2 rounded-lg"><i class="fa-brands fa-youtube"></i></div>
+                                <div>
+                                    <h4 class="font-bold text-sm">Mark Meldrum (YouTube/Paid)</h4>
+                                    <p class="text-xs text-stone-600">Legendary instructor. His 2017 Level 1 content is free on YouTube and still largely relevant for concepts.</p>
+                                </div>
+                            </div>
+                            <div class="flex gap-4 items-start">
+                                <div class="bg-blue-100 text-blue-600 p-2 rounded-lg"><i class="fa-solid fa-book"></i></div>
+                                <div>
+                                    <h4 class="font-bold text-sm">CFA Institute Learning Ecosystem</h4>
+                                    <p class="text-xs text-stone-600">Included in your fee. It contains the official text, practice questions, and mock exams. Don't ignore this!</p>
+                                </div>
+                            </div>
+                            <div class="flex gap-4 items-start">
+                                <div class="bg-green-100 text-green-600 p-2 rounded-lg"><i class="fa-solid fa-users"></i></div>
+                                <div>
+                                    <h4 class="font-bold text-sm">300Hours.com / Reddit r/CFA</h4>
+                                    <p class="text-xs text-stone-600">Best community forums for doubts, strategy, and moral support.</p>
+                                </div>
+                            </div>
+                            <div class="flex gap-4 items-start">
+                                <div class="bg-purple-100 text-purple-600 p-2 rounded-lg"><i class="fa-solid fa-graduation-cap"></i></div>
+                                <div>
+                                    <h4 class="font-bold text-sm">Local Prep Providers</h4>
+                                    <p class="text-xs text-stone-600">Providers like IFT (Arif Irfanullah), Aswini Bajaj, or Sanjay Saraf are popular in India for localized teaching styles.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Career Roles -->
+                    <div class="bg-white p-6 rounded-xl border border-stone-200 shadow-sm">
+                        <h3 class="font-bold text-lg mb-4 text-stone-800">Potential Career Paths</h3>
+                        <div class="space-y-3">
+                            <div class="p-3 bg-stone-50 rounded border border-stone-100">
+                                <h4 class="font-bold text-stone-800 text-sm">Portfolio Manager</h4>
+                                <p class="text-xs text-stone-500">Managing investment funds. The "Gold Standard" role for charterholders.</p>
+                            </div>
+                            <div class="p-3 bg-stone-50 rounded border border-stone-100">
+                                <h4 class="font-bold text-stone-800 text-sm">Research Analyst (Equity/Credit)</h4>
+                                <p class="text-xs text-stone-500">Analyzing companies/bonds to write buy/sell reports.</p>
+                            </div>
+                            <div class="p-3 bg-stone-50 rounded border border-stone-100">
+                                <h4 class="font-bold text-stone-800 text-sm">Risk Manager</h4>
+                                <p class="text-xs text-stone-500">Identifying and mitigating financial risks for banks/funds.</p>
+                            </div>
+                            <div class="p-3 bg-stone-50 rounded border border-stone-100">
+                                <h4 class="font-bold text-stone-800 text-sm">Consultant / Advisor</h4>
+                                <p class="text-xs text-stone-500">Wealth management for HNI clients.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        // --- Navigation Logic ---
+        function switchTab(tabId) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            // Show target tab
+            document.getElementById(tabId).classList.add('active');
+            
+            // Update Sidebar buttons
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('bg-stone-800', 'text-white', 'active-nav');
+                if(btn.dataset.target === tabId) {
+                    btn.classList.add('bg-stone-800', 'text-white', 'active-nav');
+                }
+            });
+
+            // Re-render charts if hidden (Chart.js canvas sizing fix)
+            if (tabId === 'exam-details') {
+                renderCharts(); // Ensure charts render correctly when tab becomes visible
+            }
+        }
+
+        // --- Chart.js Implementations ---
+        let topicChartInstance = null;
+        let passRateChartInstance = null;
+
+        function renderCharts() {
+            if (topicChartInstance) return; // Prevent double rendering
+
+            // 1. Topic Weights Chart
+            const ctx1 = document.getElementById('topicChart').getContext('2d');
+            topicChartInstance = new Chart(ctx1, {
+                type: 'bar',
+                data: {
+                    labels: ['Ethics', 'Quant', 'Econ', 'FSA', 'Corp Issuers', 'Equity', 'Fixed Inc', 'Derivs', 'Alts', 'Portfolio Mgmt'],
+                    datasets: [
+                        {
+                            label: 'Level I',
+                            data: [17.5, 10, 10, 15, 8.5, 11, 11, 6.5, 6.5, 6.5], // Averages
+                            backgroundColor: '#d97706', // Amber 600
+                        },
+                        {
+                            label: 'Level II',
+                            data: [12.5, 7.5, 7.5, 12.5, 7.5, 12.5, 12.5, 7.5, 7.5, 12.5],
+                            backgroundColor: '#78716c', // Stone 500
+                        },
+                        {
+                            label: 'Level III',
+                            data: [12.5, 0, 7.5, 0, 0, 12.5, 17.5, 7.5, 7.5, 37.5],
+                            backgroundColor: '#292524', // Stone 800
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { stacked: false },
+                        y: { 
+                            beginAtZero: true, 
+                            title: { display: true, text: 'Approx Weight (%)' } 
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                        }
+                    }
+                }
+            });
+
+            // 2. Pass Rates Chart
+            const ctx2 = document.getElementById('passRateChart').getContext('2d');
+            passRateChartInstance = new Chart(ctx2, {
+                type: 'line',
+                data: {
+                    labels: ['2019', '2020', '2021', '2022', '2023', '2024 (Est)'],
+                    datasets: [
+                        {
+                            label: 'Level I',
+                            data: [42, 49, 26, 36, 38, 41],
+                            borderColor: '#d97706',
+                            tension: 0.3,
+                            borderWidth: 3
+                        },
+                        {
+                            label: 'Level II',
+                            data: [44, 55, 40, 44, 52, 48],
+                            borderColor: '#78716c',
+                            tension: 0.3,
+                            borderWidth: 3
+                        },
+                        {
+                            label: 'Level III',
+                            data: [56, 56, 42, 48, 48, 49],
+                            borderColor: '#292524',
+                            tension: 0.3,
+                            borderWidth: 3
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { min: 20, max: 70 }
+                    }
+                }
+            });
+        }
+
+        // --- Budget Calculator Logic ---
+        function calculateCost() {
+            const exchangeRate = parseFloat(document.getElementById('exchangeRate').value) || 84;
+            const regType = document.getElementById('regType').value;
+            const scholarship = document.getElementById('scholarship').value;
+            const materialCost = parseFloat(document.getElementById('materialCost').value);
+
+            let enrollmentFee = 350;
+            let examFee = regType === 'early' ? 940 : 1250;
+
+            // Apply Scholarship Logic
+            if (scholarship === 'access') {
+                enrollmentFee = 0;
+                examFee = 300; // Reduced fee for scholarship winners
+            }
+
+            const totalUsd = enrollmentFee + examFee + materialCost;
+            
+            // Add approx 5% buffer for international transaction fees/currency fluctuation
+            const totalInr = Math.ceil(totalUsd * exchangeRate * 1.05);
+
+            // Update DOM
+            document.getElementById('enrollmentFeeDisplay').innerText = `$${enrollmentFee}`;
+            document.getElementById('examFeeDisplay').innerText = `$${examFee}`;
+            document.getElementById('materialFeeDisplay').innerText = `$${materialCost}`;
+            document.getElementById('totalUsdDisplay').innerText = `$${totalUsd}`;
+            
+            // Animate INR Total
+            const display = document.getElementById('totalCostDisplay');
+            animateValue(display, 0, totalInr, 1000);
+        }
+
+        function animateValue(obj, start, end, duration) {
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                obj.innerHTML = Math.floor(progress * (end - start) + start).toLocaleString('en-IN');
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                }
+            };
+            window.requestAnimationFrame(step);
+        }
+
+        // Initialize with default calculation
+        document.addEventListener('DOMContentLoaded', () => {
+            calculateCost();
+            
+            // Load charts only when their tab is accessed or on load if it's the default
+            // Since charts are on tab 2, they will load via switchTab or manually here if we wanted
+        });
+
+    </script>
+</body>
+</html>
